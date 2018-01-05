@@ -1,4 +1,4 @@
-# Three.js Starter
+# Pachamama Project
 
 ## Setup
 

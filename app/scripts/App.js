@@ -54,6 +54,8 @@ export default class App {
 
         var self = this;
         var gui = new Dat.GUI();
+
+        gui.close();
         var branch = gui.addFolder('Branch');
         var trunk = gui.addFolder('Trunk');
 
