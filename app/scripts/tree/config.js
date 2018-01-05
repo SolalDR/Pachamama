@@ -13,6 +13,7 @@ export default {
 	TRUNK : 2,
 	HERITANCE: 3,
 
+	
 
 	branch: {
 		
@@ -22,9 +23,6 @@ export default {
 			speed: 0.15
 		},
 		
-
-		dist: 0.1,
-
 		// Length
 		l: {
 			min: 0.1,
@@ -77,8 +75,6 @@ export default {
 			w: 0.3
 		},
 
-		dist: 0.1,
-
 		// Noise factor null because the trunk is straight
 		noise : {
 			force: 0.15,
@@ -101,9 +97,8 @@ export default {
 	compute: {
 
 		precision: 0.01,
-
-		size: 0.01
-
+		dist: 0.1
+		
 	}
 
 }

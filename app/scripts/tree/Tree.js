@@ -20,8 +20,8 @@
 import config from "./config.js"
 import { Noise } from "noisejs"
 import Branch from "./Branch.js"
-import fragment from "./../../glsl/model.frag"
-import vertex from "./../../glsl/model.vert"
+import fragment from "./glsl/classic.frag"
+import vertex from "./glsl/classic.vert"
 
 class Tree {
 	
@@ -89,8 +89,7 @@ class Tree {
 			uniforms: uniforms, 
 			fragmentShader: fragment,
 			vertexShader: vertex,
-			color: 0x888888,
-			size: config.compute.size
+			color: 0x888888
 		});
 
 		this.mesh = new THREE.Points(this.geometry, this.material);

@@ -43,9 +43,7 @@ class Branch {
 			this.baseLength = this.parent.length;
 
 		} else {
-
 			this.noiseCoord = new THREE.Vector2(Math.random(), Math.random());	
-
 		}
 
 		var prop = Probability.between(config.branch.w.transfer.min, config.branch.w.transfer.max);
@@ -126,7 +124,7 @@ class Branch {
 
 
 			// Calculate the number of circle's points and the resulted step angle 
-			c = Math.floor(2*Math.PI*w/this.config.dist); 
+			c = Math.floor(2*Math.PI*w/config.compute.dist); 
 			incAngle = Math.PI*2/c;
 
 			// Create a random offset angle 

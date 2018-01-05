@@ -49,7 +49,10 @@ html, body {
 }
 
 @media screen and (max-width: 600px) {
-	
+	/*Datgui*/
+	.dg.ac {
+		display: none;
+	}
 	.hide-sm {
 		display: none;
 	}

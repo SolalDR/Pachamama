@@ -41,7 +41,7 @@ export default class App {
         this.tree = new Tree();
         this.scene.add(this.tree.mesh)
 
-        this.initDatGUI();
+        if( this.config.gui ) this.initDatGUI();
 
         this.onWindowResize();
         this.renderer.animate( this.render.bind(this) );
@@ -59,8 +59,9 @@ export default class App {
         var branch = gui.addFolder('Branch');
         var trunk = gui.addFolder('Trunk');
 
-        gui.add(Tree.CONFIG.compute, 'size', 0, 1).onFinishChange(self.tree.update.bind(self.tree));
-
+        gui.add(Tree.CONFIG.compute, 'precision', 0.001, 0.1).onFinishChange(self.tree.update.bind(self.tree));
+        gui.add(Tree.CONFIG.compute, 'dist', 0, 1).onFinishChange(self.tree.update.bind(self.tree));
+        
         /**********
         *  Trunk
         **********/
@@ -79,6 +80,10 @@ export default class App {
 
         trunk.add(Tree.CONFIG.trunk.noise, 'force', 0, 2)
             .name("twistForce")
+            .onFinishChange(self.tree.update.bind(self.tree));
+
+        trunk.add(Tree.CONFIG.trunk.transition, 'w', 0, 1)
+            .name("weightTransition")
             .onFinishChange(self.tree.update.bind(self.tree));
 
         var trunkChild = trunk.addFolder("Branch Child creation");
@@ -112,6 +117,10 @@ export default class App {
 
         branch.add(Tree.CONFIG.branch.noise, 'force', 0, 2)
             .name("twistForce")
+            .onFinishChange(self.tree.update.bind(self.tree));
+
+        branch.add(Tree.CONFIG.branch.transition, 'w', 0, 1)
+            .name("weightTransition")
             .onFinishChange(self.tree.update.bind(self.tree));
 
         var branchChild = branch.addFolder("Branch Child creation");
