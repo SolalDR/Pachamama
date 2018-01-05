@@ -1,0 +1,69 @@
+html, body {
+    margin: 0;
+    padding: 0;
+
+    background: #000;
+    font-family: sans-serif;
+}
+
+
+.side-front {
+	position: absolute;
+	top: 0; 
+	left: 0;
+	z-index: 999;
+	height: 100vh; 
+	padding: 50px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	box-sizing: border-box;
+	transition: all .4s ease;
+}
+
+.title--main {
+	font-size: 40px;
+	font-weight: 100;
+	margin: 10px 0;
+	line-height: 30px;
+	transition: all .4s ease;
+}
+
+
+.title--second {
+	font-size: 20px;
+	font-weight: 100;
+	margin: 10px 0px;
+	line-height: 30px;
+	transition: all .4s ease;
+}
+
+@media screen and (max-width: 1040px) {
+	.title--main {
+		font-size: 20px;
+	}
+	.title--second {
+		font-size: 12px;
+		line-height: 20px;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	
+	.hide-sm {
+		display: none;
+	}
+
+	.side-front {
+		padding: 20px;
+		height: 60px;
+	}
+
+	.title--main {
+		font-size: 20px;
+	}
+	.title--second {
+		font-size: 12px;
+		line-height: 20px;
+	}
+}
