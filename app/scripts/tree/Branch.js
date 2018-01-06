@@ -32,6 +32,14 @@ class Branch {
 		return false;
 	}
 
+	update() {
+		this.baseCoord = this.parent == null ? new THREE.Vector3() : this.parent.topCoord;
+		this.topCoord = this.getCoordsAtLength(this.length);
+		for(var i = 0; i < this.ramifications.length; i++){
+			this.ramifications[i].update();
+		}
+	}
+
 	// Init for the trunk 
 	initTrunk() {
 		this.length = config.trunk.l; 

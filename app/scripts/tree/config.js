@@ -79,7 +79,7 @@ export default {
 			
 			},
 
-			countChild: [0, 0, 2, 7, 0, 0] // 0 branch, 1 branch, 2 branches
+			countChild: [0, 0, 0, 7, 0, 0] // 0 branch, 1 branch, 2 branches
 		}
 	},
 

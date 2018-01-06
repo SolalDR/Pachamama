@@ -44,30 +44,20 @@ class Tree {
 			type: Tree.CONFIG.TRUNK,
 			noise: this.noise 
 		});
+
+		this.newGeometry();
 	}
 
-	update(){
-
-		this.new();
-
-		this.createGeometry();
-		this.mesh.geometry = this.geometry;
-
+	newGeometry() {
+		this.tree.update();
+		this.geometry = new TreeGeometry(this, { animate: true });
+		if( this.mesh ) this.mesh.geometry = this.geometry;	
 	}
-
 
 	render(time){
 		this.time = time;
 		this.material.uniforms.time.value = time;
 		this.material.uniforms.needsUpdate = true;
-	}
-
-
-
-	createGeometry(){
-		this.geometry = new TreeGeometry(this, {
-			animate: true
-		});
 	}
 
 	get uniforms() {
@@ -84,6 +74,16 @@ class Tree {
 		}
 	}
 
+	updateUniforms() {
+		this.material.uniforms.noiseSpeed.value = Tree.CONFIG.animation.noise.speed; 
+		this.material.uniforms.noiseIntensity.value = Tree.CONFIG.animation.noise.force; 
+		this.material.uniforms.animRadius.value = Tree.CONFIG.animation.hurricane.radius; 
+		this.material.uniforms.animRotationSpeed.value = Tree.CONFIG.animation.hurricane.turns; 
+		this.material.uniforms.durationLeave.value = Tree.CONFIG.animation.durationLeave; 
+		this.material.uniforms.pointSize.value = Tree.CONFIG.compute.pointW; 
+		this.material.uniforms.needsUpdate = true;
+	}
+
 	display() {
 		this.material.uniforms.start.value = this.time;
 		this.material.uniforms.isLeaving.value = false;
@@ -98,13 +98,14 @@ class Tree {
 
 	init() {
 
-		this.createGeometry();
+		this.geometry = new TreeGeometry(this, {
+			animate: true
+		});
 
 		this.material = new THREE.ShaderMaterial({
 			uniforms: this.uniforms, 
 			fragmentShader: fragment,
-			vertexShader: vertex,
-			color: 0x888888
+			vertexShader: vertex
 		});
 
 		this.mesh = new THREE.Points(this.geometry, this.material);
