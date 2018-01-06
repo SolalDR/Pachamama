@@ -1,19 +1,8 @@
-/* 
-
-@TODO
-
-- New Ramification probability
-probability per iteration of create  
-
-*/
-
 export default {
 
 	BRANCH : 1,
 	TRUNK : 2,
 	HERITANCE: 3,
-
-	
 
 	branch: {
 		

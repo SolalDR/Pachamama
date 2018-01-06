@@ -29,17 +29,46 @@ class Random {
 	}
 
 
-	static randomInDisc(minRadius, maxRadius) {
-		var angle = Math.random() * 2*Math.PI;
-		return new Vector2(
-			Math.cos(angle) * radius,
-			Math.sin(angle) * radius
+	static inSphere(radius) {
+		var theta = 2 * Math.PI * Math.random();
+		var phi = Math.acos(2 * Math.random() - 1);
+		return new Vector3(
+			radius * Math.sin(phi) * Math.cos(theta),
+			radius * Math.sin(phi) * Math.sin(theta),
+			radius * Math.cos(phi)
 		);
 	}
 
 
+	static randomInDisc(radius) {
+		var angle = Math.random() * 2*Math.PI;
+		return new Vector3(
+			Math.cos(angle) * radius,
+			0,
+			Math.sin(angle) * radius
+		);
+	}
+
+	
+
 	static betweenNumber (a, b) {
 		return (b - a)*Math.random() + a;
+	}
+
+	static loopRandomInDisc(n, radius) {
+		var nums = [];
+		for(var i=0; i<n; i++){
+			nums.push(Random.randomInDisc(radius));
+		}
+		return nums;
+	}
+
+	static loopBetweenNumber(n, a, b) {
+		var nums = [];
+		for(var i=0; i<n; i++){
+			nums.push(Random.betweenNumber(a, b));
+		}
+		return nums;
 	}
 
 }

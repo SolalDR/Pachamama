@@ -1,4 +1,11 @@
 uniform float time; 
+attribute float animation; 
+attribute vec3 floorPos; 
+
+float cubicOut(float t) {
+  float f = t - 1.0;
+  return f * f * f + 1.0;
+}
 
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -29,8 +36,11 @@ float noise(vec3 p){
 void main() {
     gl_PointSize = 1.5;
 
+    float anim = cubicOut(min(1., time/animation)); 
+
     vec3 newPosition;
-    newPosition = position + position * noise( vec3(position.xy, position.z + time ) ) * 0.1;
+    newPosition = position + position * noise( vec3(position.xy, position.z + time/1000. ) ) * 0.1;
+    newPosition = newPosition*anim; 
 
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
 

@@ -4,9 +4,12 @@ import Random from "./helpers/Random.js"
 
 class Branch {
 
+	/**
+	 * @constructor
+	 */
 	constructor ( args ) {
 		this.type = args.type !== undefined ? args.type : config.BRANCH;
-		this.inheritance = args.inheritance ? true : false; 
+		// @TODO this.inheritance = args.inheritance ? true : false; 
 		this.parent = this.type == config.TRUNK ? null : args.parent; 
 		this.noise = args.noise !== undefined ? args.noise : this.parent.noise; 
 		this.length = null;
@@ -16,23 +19,27 @@ class Branch {
 		this.init();
 	}
 
+	// Return the config based on the type 
 	get config() {
 		return this.type == config.TRUNK ? config.trunk : config.branch;
 	}
 
-	testParent() {
+	// If branch is to thin, it cannot have ramification 
+	get canHaveChild() {
 		if( this.weight > config.branch.w.min ) {
 			return true;
 		}
 		return false;
 	}
 
+	// Init for the trunk 
 	initTrunk() {
 		this.length = config.trunk.l; 
 		this.weight = config.trunk.w;
 		this.noiseCoord = new THREE.Vector2(Math.random(), Math.random());
 	}
 
+	// Init for a branch
 	initBranch(){
 
 		// If branch is an inheritance, we copy certain value from the parent
@@ -65,13 +72,15 @@ class Branch {
 		this.baseCoord = this.parent == null ? new THREE.Vector3() : this.parent.topCoord;
 		this.topCoord = this.getCoordsAtLength(this.length);
 
-		if( this.testParent() ) {
+		if( this.canHaveChild ) {
 			this.genRamification(); 
 		}
 	}
 
+	/**
+	 * Create the ramification
+	 */
 	genRamification () {
-
 		var count = Probability.random(this.config.prob.countChild);
 		var behaviourSeparation = Probability.random(this.config.prob.behaviourSeparation); 
 		var inheritance = behaviourSeparation == "ramification" ? true : false; 
@@ -82,26 +91,34 @@ class Branch {
 			}));
 			inheritance = false; 
 		}
-
 	}
 
+	/**
+	 * Calculate the position of a point in the branch
+	 * @param {integer} l - the advancement
+	 * @returns {Vector3} 
+	 */
 	getCoordsAtLength(l) {
-
 		var c = this.config; 
 
 		var xDiff = c.noise.force * l * this.noise.simplex2(c.noise.speed * l + this.noiseCoord.x, this.noiseCoord.y );
 		var zDiff = c.noise.force * l * this.noise.simplex2(this.noiseCoord.x, this.noiseCoord.x + c.noise.speed *  l );
 
-		var base = new THREE.Vector3().copy(this.baseCoord);
+		var point = new THREE.Vector3().copy(this.baseCoord);
 
-		base.x += xDiff;
-		base.y += l; 
-		base.z += zDiff
+		point.x += xDiff;
+		point.y += l; 
+		point.z += zDiff
 
-		return base;
-
+		return point;
 	}
 
+	/**
+	 * Gen circle arround a point 
+	 * @param {Vector3[]} basePoints - the array of all the Vector3 representing a branch
+	 * @param {integer} precision
+	 * @returns {Vector3[]}
+	 */
 	genCircles(basePoints, precision) {
 		var points = [], direction, point, c, angle, crossAngle, cross, baseAngle, incAngle, w, advancement, diffWeight;
 		
@@ -162,7 +179,11 @@ class Branch {
 		return points;
 	}
 
-
+	/**
+	 * Calculate the position of each point on a branch 
+	 * @param {integer} precision - The precision define the increment size so the resolution to.
+	 * @returns {Vector3[]}
+	 */
 	compute(precision) {
 		var points = [];
 		var expectedL = Math.floor(this.length / precision);
