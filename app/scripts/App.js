@@ -61,7 +61,9 @@ export default class App {
 
         gui.add(Tree.CONFIG.compute, 'precision', 0.001, 0.1).onFinishChange(self.tree.update.bind(self.tree));
         gui.add(Tree.CONFIG.compute, 'dist', 0, 1).onFinishChange(self.tree.update.bind(self.tree));
-        
+        gui.add(this.tree, 'display')
+        gui.add(this.tree, 'hide')
+
         /**********
         *  Trunk
         **********/

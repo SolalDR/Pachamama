@@ -1,6 +1,5 @@
 /*	  
 
-
   This is a goal
 
 	  o*****
@@ -14,13 +13,11 @@
 		||
 	|-|-|-|-|-
 
-
 */
 
 import config from "./config.js"
 import { Noise } from "noisejs"
 import Branch from "./Branch.js"
-import Random from "./helpers/Random.js"
 import fragment from "./glsl/classic.frag"
 import vertex from "./glsl/hurricane.vert"
 
@@ -60,6 +57,7 @@ class Tree {
 
 
 	render(time){
+		this.time = time;
 		this.material.uniforms.time.value = time;
 		this.material.uniforms.needsUpdate = true;
 	}
@@ -67,32 +65,43 @@ class Tree {
 
 
 	createGeometry(){
-
 		this.geometry = new TreeGeometry(this, {
 			animate: true
 		});
-		
-		var length = this.geometry.vertices.length
-		var animationPoints = new Float32Array(length);	
-		for(var i = 0; i < length; i++) {
-			animationPoints[i] = this.geometry.vertices[i].y * 500 + Random.betweenNumber(500, 1000)
+	}
+
+	get uniforms() {
+		return {
+			time: { type: "f", value: 0 },
+			start: { type: "f", value: 0},
+			isLeaving: { type: "bool", value: false },
+			noiseSpeed: { type: "f", value: Tree.CONFIG.animation.noise.speed },
+			noiseIntensity: { type: "f", value: Tree.CONFIG.animation.noise.force },
+			animRadius: { type: "f", value: Tree.CONFIG.animation.hurricane.radius },
+			animRotationSpeed: { type: "f", value: Tree.CONFIG.animation.hurricane.turns },
+			durationLeave: { type: "f", value: Tree.CONFIG.animation.durationLeave },
+			pointSize: { type: "f", value: Tree.CONFIG.compute.pointW }
 		}
-		var animationDecal = new Float32Array(length).fill(0).map( x => Math.random()*1000 );	
+	}
 
-		this.geometry.addAttribute( 'animation', new THREE.BufferAttribute( animationPoints , 1 ) );
-		this.geometry.addAttribute( 'start', new THREE.BufferAttribute( animationDecal , 1 ) );
+	display() {
+		this.material.uniforms.start.value = this.time;
+		this.material.uniforms.isLeaving.value = false;
+		this.material.uniforms.needsUpdate = true; 
+	}
 
+	hide() {
+		this.material.uniforms.start.value = this.time;
+		this.material.uniforms.isLeaving.value = true;
+		this.material.uniforms.needsUpdate = true; 
 	}
 
 	init() {
 
 		this.createGeometry();
 
-		var uniforms =  {
-			time: { type: "f", value: 0 }
-		}
 		this.material = new THREE.ShaderMaterial({
-			uniforms: uniforms, 
+			uniforms: this.uniforms, 
 			fragmentShader: fragment,
 			vertexShader: vertex,
 			color: 0x888888
@@ -100,7 +109,7 @@ class Tree {
 
 		this.mesh = new THREE.Points(this.geometry, this.material);
 		this.mesh.name = "Tree";
-		this.mesh.position.y = -5
+		this.mesh.position.y = -5;
 
 	}
 

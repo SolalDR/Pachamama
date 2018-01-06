@@ -1,7 +1,22 @@
 uniform float time;
-attribute float animation;
+uniform float start;
+uniform bool isLeaving;
+
+uniform float noiseSpeed;
+uniform float noiseIntensity;
+uniform float pointSize;
+uniform float animRadius;
+uniform float animRotationSpeed;
+uniform float durationLeave;
+
+attribute float duration;
 vec3 floorPos = vec3(0., -10., 0.); 
-attribute float start;
+attribute float delay;
+
+float linearAnim = 0.;
+
+
+
 
 #define PI 3.14159265358979323846
 
@@ -9,6 +24,10 @@ attribute float start;
 
 float quadraticOut(float t) {
   return -t * (t - 2.0);
+}
+
+float quadraticIn(float t) {
+  return t * t;
 }
 
 float cubicInOut(float t) {
@@ -46,40 +65,47 @@ float noise(vec3 p){
 }
 
 
+
+
 vec3 hurricane(float anim, vec3 origin, vec3 target){
     float radius;
         
     if( anim < 0.5 ){
-        radius = cubicInOut(anim*2.) * 2.; 
+        radius = cubicInOut(anim*2.) * animRadius; 
     } else {
-        radius = 1. - cubicInOut((anim - 0.5)*2.) * 2.;
+        radius = 1. - cubicInOut((anim - 0.5)*2.) * animRadius;
     }
 
-    vec3 trans = origin + (target - origin) * anim;    
-    vec3 local = vec3( cos ( anim * 2. * PI * 5. ) * radius, 0., sin( anim * 2. * PI * 5. ) * radius );
+    vec3 pos = origin + (target - origin) * anim;    
+    vec3 rotatePos = vec3( cos ( anim * 2. * PI * animRotationSpeed ) * radius, 0., sin( anim * 2. * PI * animRotationSpeed ) * radius );
    
-    return local + trans;
-
-    return target;
+    return pos + rotatePos;
 }
 
 
 void main() {
+    vec3 newPosition = position;
+    float anim; 
 
-    float linearAnim = 0.;
-
-    if( time > start ){
-        linearAnim = min(1., (time - start)/(start+animation)); 
+    if (isLeaving) {
+        if( time > start + delay ){
+            linearAnim = min(1., (time - start - delay)/(delay + durationLeave)); 
+        }
+        anim = 1. - quadraticIn(linearAnim); 
+    } else {
+        if( time > start + delay ){
+            linearAnim = min(1., (time - start - delay)/(delay + duration)); 
+        }
+        anim = quadraticOut(linearAnim); 
     }
 
-    float anim = quadraticOut(linearAnim); 
+    if( anim < 1. ){ 
+        newPosition = hurricane( anim, floorPos, position ); 
+    } 
+
+    newPosition = newPosition + position * noise( vec3( position.xy, position.z + time*noiseSpeed ) ) * noiseIntensity;
     
-    vec3 newPosition = position;
-    if( anim < 1. ){ newPosition = hurricane( anim, floorPos, position ); } 
-    
-    newPosition = newPosition + position * noise( vec3( position.xy, position.z + time/1000. ) ) * 0.1;
-    
-    gl_PointSize = 1.5;
+    gl_PointSize = pointSize;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
 
 }

@@ -1,6 +1,6 @@
-uniform float time; 
+uniform float time;
+uniform float start; 
 attribute float animation; 
-attribute vec3 floorPos; 
 
 float cubicOut(float t) {
   float f = t - 1.0;

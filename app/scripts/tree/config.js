@@ -86,8 +86,22 @@ export default {
 	compute: {
 
 		precision: 0.01,
-		dist: 0.1
-		
+		dist: 0.1,
+		pointW: 1.5 // GUI
+
+	},
+
+	animation: {
+		noise: {
+			speed: 0.001,  	// noiseSpeed
+			force: 0.1		// noiseIntensity
+		},
+		hurricane: {
+			radius: 2, 		// animRadius
+			turns: 5 		// animRotationSpeed
+		},
+
+		durationLeave: 500	// GUI
 	}
 
 }
