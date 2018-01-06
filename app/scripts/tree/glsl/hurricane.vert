@@ -1,13 +1,14 @@
-uniform float time; 
-attribute float animation; 
-attribute vec3 floorPos; 
-attribute float animationStart;
+uniform float time;
+attribute float animation;
+vec3 floorPos = vec3(0., -10., 0.); 
+attribute float start;
 
 #define PI 3.14159265358979323846
 
-float cubicOut(float t) {
-  float f = t - 1.0;
-  return f * f * f + 1.0;
+// Transition function
+
+float quadraticOut(float t) {
+  return -t * (t - 2.0);
 }
 
 float cubicInOut(float t) {
@@ -15,6 +16,8 @@ float cubicInOut(float t) {
     ? 4.0 * t * t * t
     : 0.5 * pow(2.0 * t - 2.0, 3.0) + 1.0;
 }
+
+// Noise
 
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -42,40 +45,41 @@ float noise(vec3 p){
     return o4.y * d.y + o4.x * (1.0 - d.y);
 }
 
-void main() {
-    gl_PointSize = 1.5;
 
-    float linearAnim = 0.;
-    if( time > animationStart ){
-        linearAnim = min(1., (time - animationStart)/(animationStart+animation)); 
-    }
-    
-    float anim = cubicOut(linearAnim); 
+vec3 hurricane(float anim, vec3 origin, vec3 target){
     float radius;
-
-
+        
     if( anim < 0.5 ){
         radius = cubicInOut(anim*2.) * 2.; 
     } else {
         radius = 1. - cubicInOut((anim - 0.5)*2.) * 2.;
     }
 
-    vec3 newPosition;
+    vec3 trans = origin + (target - origin) * anim;    
+    vec3 local = vec3( cos ( anim * 2. * PI * 5. ) * radius, 0., sin( anim * 2. * PI * 5. ) * radius );
+   
+    return local + trans;
 
+    return target;
+}
+
+
+void main() {
+
+    float linearAnim = 0.;
+
+    if( time > start ){
+        linearAnim = min(1., (time - start)/(start+animation)); 
+    }
+
+    float anim = quadraticOut(linearAnim); 
     
-    vec3 trans = floorPos + (position - floorPos) * anim;
-    vec3 local = vec3( trans.x + cos(anim*6.*PI)*radius, trans.y, trans.z + sin(anim*2.*PI)*radius );
+    vec3 newPosition = position;
+    if( anim < 1. ){ newPosition = hurricane( anim, floorPos, position ); } 
     
-
-    local = vec3( cos(linearAnim*2.*PI * 5.) * radius, 0, sin(linearAnim*2.*PI * 5.) * radius);
-
-
-    newPosition = local + trans;
-    newPosition = newPosition + position * noise( vec3(position.xy, position.z + time/1000. ) ) * 0.1;
+    newPosition = newPosition + position * noise( vec3( position.xy, position.z + time/1000. ) ) * 0.1;
     
-
-
-
+    gl_PointSize = 1.5;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
 
 }
