@@ -1,2 +1,5 @@
 exclude_patterns:
 - "app/scripts/helpers/OrbitControls.js"
+- "app/scripts/gui.js"
+- "app/scripts/config.js"
+- "webpack.config.js"

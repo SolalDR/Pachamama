@@ -1,10 +1,10 @@
 
 import OrbitControls from "./helpers/OrbitControls.js"
-import Dat from "dat-gui"
 import { Stats } from "three-stats"
 import Clock from "./helpers/Clock.js"
 import Tree from "./tree/Tree.js"
 import config from "./config.js"
+import initDatGUI from "./gui.js"
 
 export default class App {
 
@@ -41,7 +41,11 @@ export default class App {
         this.tree = new Tree();
         this.scene.add(this.tree.mesh)
 
-        if( this.config.gui ) this.initDatGUI();
+        // console.log(initDatGUI)
+        if( this.config.gui ) {
+            this.initDatGUI = initDatGUI.bind(this);
+            this.initDatGUI();
+        }
 
         this.onWindowResize();
         this.renderer.animate( this.render.bind(this) );
@@ -49,112 +53,6 @@ export default class App {
 
 
     // -----------------------------------------
-
-    initDatGUI() {
-
-        var self = this;
-        var gui = new Dat.GUI();
-
-        gui.close();
-        var branch = gui.addFolder('Branch');
-        var trunk = gui.addFolder('Trunk');
-        var animation = gui.addFolder('Animation');
-
-        gui.add(Tree.CONFIG.compute, 'precision', 0.001, 0.1).onFinishChange(self.tree.newGeometry.bind(self.tree));
-        gui.add(Tree.CONFIG.compute, 'dist', 0.001, 1).onFinishChange(self.tree.newGeometry.bind(self.tree));
-        gui.add(Tree.CONFIG.compute, 'pointW', 0, 1).onFinishChange(self.tree.newGeometry.bind(self.tree));
-
-        gui.add(this.tree, 'display')
-        gui.add(this.tree, 'hide')
-
-        /**********
-        *  Trunk
-        **********/
-
-        trunk.add(Tree.CONFIG.trunk, 'l', 0, 10)
-            .name("length").onFinishChange(self.tree.new.bind(self.tree));
-
-        trunk.add(Tree.CONFIG.trunk, 'w', 0, 2.5)
-            .name("weight").onFinishChange(self.tree.new.bind(self.tree));
-       
-        trunk.add(Tree.CONFIG.trunk.noise, 'speed', 0, 2)
-            .name("twistChangeSpeed").onFinishChange(self.tree.newGeometry.bind(self.tree));
-
-        trunk.add(Tree.CONFIG.trunk.noise, 'force', 0, 2)
-            .name("twistForce").onFinishChange(self.tree.newGeometry.bind(self.tree));
-
-        trunk.add(Tree.CONFIG.trunk.transition, 'w', 0, 1)
-            .name("weightTransition").onFinishChange(self.tree.newGeometry.bind(self.tree));
-
-        var trunkChild = trunk.addFolder("Branch Child creation");
-
-        trunkChild.add(Tree.CONFIG.trunk.prob.behaviourSeparation, "division", 0, 1)
-            .name("Division").onFinishChange(self.tree.new.bind(self.tree));
-
-        trunkChild.add(Tree.CONFIG.trunk.prob.behaviourSeparation, "ramification", 0, 1)
-            .name("Ramification").onFinishChange(self.tree.new.bind(self.tree));
-
-        var trunkChildCreation = trunkChild.addFolder("Number of child branches (probability)");
-        for(var i=0; i < Tree.CONFIG.trunk.prob.countChild.length; i++){
-            trunkChildCreation.add(Tree.CONFIG.trunk.prob.countChild, i, 0, 10)
-                .step(0.2).onFinishChange(self.tree.new.bind(self.tree));
-        }
-        
-        /**********
-        *  Branch
-        **********/
-
-        this.manageMinMaxGui(Tree.CONFIG.branch.l, branch, 0, 10, "Length");
-        this.manageMinMaxGui(Tree.CONFIG.branch.w, branch, 0, 2, "Weight");
-        this.manageMinMaxGui(Tree.CONFIG.branch.w.transfer, branch, 0, 1, "Transfer"); 
-
-        branch.add(Tree.CONFIG.branch.noise, 'speed', 0, 2)
-            .name("twistChangeSpeed").onFinishChange(self.tree.newGeometry.bind(self.tree));
-
-        branch.add(Tree.CONFIG.branch.noise, 'force', 0, 2)
-            .name("twistForce").onFinishChange(self.tree.newGeometry.bind(self.tree));
-
-        branch.add(Tree.CONFIG.branch.transition, 'w', 0, 1)
-            .name("weightTransition").onFinishChange(self.tree.newGeometry.bind(self.tree));
-
-        var branchChild = branch.addFolder("Branch Child creation");
-       
-        branchChild.add(Tree.CONFIG.branch.prob.behaviourSeparation, "division", 0, 1)
-            .name("Division").onFinishChange(self.tree.new.bind(self.tree));
-      
-        branchChild.add(Tree.CONFIG.branch.prob.behaviourSeparation, "ramification", 0, 1)
-            .name("Ramification").onFinishChange(self.tree.new.bind(self.tree));
-        
-        var branchCreation = branchChild.addFolder("Number of child branches (probability)");
-       
-        for(var i=0; i < Tree.CONFIG.branch.prob.countChild.length; i++){
-            branchCreation.add(Tree.CONFIG.branch.prob.countChild, i, 0, 10)
-                .step(0.2).onFinishChange(self.tree.new.bind(self.tree));
-        }
-
-        animation.add(Tree.CONFIG.animation.noise, 'speed', 0, 0.005).onChange(self.tree.updateUniforms.bind(self.tree));
-        animation.add(Tree.CONFIG.animation.noise, 'force', 0, 1).onChange(self.tree.updateUniforms.bind(self.tree));
-        animation.add(Tree.CONFIG.animation.hurricane, 'radius', 0, 5).onChange(self.tree.updateUniforms.bind(self.tree));
-        animation.add(Tree.CONFIG.animation.hurricane, 'turns', 0, 20).onChange(self.tree.updateUniforms.bind(self.tree));
-        animation.add(Tree.CONFIG.animation, 'durationLeave', 0, 5000).onChange(self.tree.updateUniforms.bind(self.tree));
-
-    }
-
-    manageMinMaxGui(config, folder, min, max, name){
-
-        var self = this;
-
-        folder.add(config, 'min', min, max).name('min'+name).listen().onChange((val)=>{
-            if( config.max < config.min)
-                config.max = config.min;
-        }).onFinishChange(self.tree.new.bind(self.tree));
-
-        folder.add(config, 'max', min, max).name('max'+name).listen().onChange((val)=>{
-            if( config.max < config.min)
-                config.min = config.max;
-        }).onFinishChange(self.tree.new.bind(self.tree));
-
-    }
 
     initStat() {
         this.stats = new Stats();
