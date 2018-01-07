@@ -1,12 +1,11 @@
 # Pachamama Project
 
-
-It is Generate random tree basing on multiple parameters. 
-
 A generative design project which allow to create in a pseudo random way an infinity of differents trees.
 It is based on the famous WebGL library, THREE.js
 
-The online demo is available <a href="https://solaldr.github.io/Pachamama/">here</a>.
+The online demo is available <a target="_blanck" href="https://solaldr.github.io/Pachamama/">here</a>.
+
+<img src="https://raw.githubusercontent.com/SolalDR/Pachamama/master/app/assets/banner.png"/>
 
 ## How it works
 
