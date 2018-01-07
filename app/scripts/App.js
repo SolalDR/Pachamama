@@ -61,7 +61,7 @@ export default class App {
         var animation = gui.addFolder('Animation');
 
         gui.add(Tree.CONFIG.compute, 'precision', 0.001, 0.1).onFinishChange(self.tree.newGeometry.bind(self.tree));
-        gui.add(Tree.CONFIG.compute, 'dist', 0, 1).onFinishChange(self.tree.newGeometry.bind(self.tree));
+        gui.add(Tree.CONFIG.compute, 'dist', 0.001, 1).onFinishChange(self.tree.newGeometry.bind(self.tree));
         gui.add(Tree.CONFIG.compute, 'pointW', 0, 1).onFinishChange(self.tree.newGeometry.bind(self.tree));
 
         gui.add(this.tree, 'display')

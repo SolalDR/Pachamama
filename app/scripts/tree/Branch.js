@@ -1,6 +1,8 @@
 import config from "./config.js"
 import Probability from "./helpers/Probability.js"
 import Random from "./helpers/Random.js"
+import Trigonometry from "./helpers/Trigonometry.js"
+
 
 class Branch {
 
@@ -9,57 +11,24 @@ class Branch {
 	 */
 	constructor ( args ) {
 		this.type = args.type !== undefined ? args.type : config.BRANCH;
-		// @TODO this.inheritance = args.inheritance ? true : false; 
-		this.parent = this.type == config.TRUNK ? null : args.parent; 
+		this.inheritance = args.inheritance ? true : false; 
+		this.parent = args.parent ? args.parent : null ; 
+		
 		this.noise = args.noise !== undefined ? args.noise : this.parent.noise; 
+		
 		this.length = null;
-		this.baseLength = 0; 
 		this.weight = null;
 		this.ramifications = [];
+
 		this.init();
 	}
 
-	// Return the config based on the type 
-	get config() {
-		return this.type == config.TRUNK ? config.trunk : config.branch;
-	}
-
-	// If branch is to thin, it cannot have ramification 
-	get canHaveChild() {
-		if( this.weight > config.branch.w.min ) {
-			return true;
-		}
-		return false;
-	}
-
-	update() {
-		this.baseCoord = this.parent == null ? new THREE.Vector3() : this.parent.topCoord;
-		this.topCoord = this.getCoordsAtLength(this.length);
-		for(var i = 0; i < this.ramifications.length; i++){
-			this.ramifications[i].update();
-		}
-	}
-
-	// Init for the trunk 
-	initTrunk() {
-		this.length = config.trunk.l; 
-		this.weight = config.trunk.w;
-		this.noiseCoord = new THREE.Vector2(Math.random(), Math.random());
-	}
-
-	// Init for a branch
-	initBranch(){
-
+	/**
+	 * Init length, weight, noiseCoords, boundaries
+	 */
+	init () {
 		// If branch is an inheritance, we copy certain value from the parent
-		if( this.inheritance ){
-
-			this.noiseCoord = this.parent.noiseCoord; 
-			this.type = this.parent.type
-			this.baseLength = this.parent.length;
-
-		} else {
-			this.noiseCoord = new THREE.Vector2(Math.random(), Math.random());	
-		}
+		this.noiseCoord = new THREE.Vector2(Math.random(), Math.random());	
 
 		var prop = Probability.between(config.branch.w.transfer.min, config.branch.w.transfer.max);
 		this.weight = prop * this.parent.weight;
@@ -68,37 +37,23 @@ class Branch {
 		var ratWL = Probability.between(config.branch.l.wRat.min, config.branch.l.wRat.max);
 		this.length = Math.min(this.weight * ratWL, config.branch.l.max);
 
+		this.refreshBoundaries();
+		if( this.canHaveChild ) this.genRamification(); 
 	}
 
-	// Init variable like length and weight
-	init () {
-		if( !this.parent )
-			this.initTrunk();
-		else
-			this.initBranch();
-		
-		this.baseCoord = this.parent == null ? new THREE.Vector3() : this.parent.topCoord;
-		this.topCoord = this.getCoordsAtLength(this.length);
+	/**************************
+	*		  Getters
+	**************************/
 
-		if( this.canHaveChild ) {
-			this.genRamification(); 
-		}
+	get config() {
+		return this.type == config.TRUNK ? config.trunk : config.branch;
 	}
 
-	/**
-	 * Create the ramification
-	 */
-	genRamification () {
-		var count = Probability.random(this.config.prob.countChild);
-		var behaviourSeparation = Probability.random(this.config.prob.behaviourSeparation); 
-		var inheritance = behaviourSeparation == "ramification" ? true : false; 
-		for(var i=0; i<count; i++) {
-			this.ramifications.push(new Branch({
-				inheritance: inheritance,
-				parent: this
-			}));
-			inheritance = false; 
+	get canHaveChild() {
+		if( this.weight > config.branch.w.min ) {
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -120,6 +75,51 @@ class Branch {
 
 		return point;
 	}
+	
+
+	/**************************
+	*		Conception
+	**************************/
+
+	/**
+	 * Set the boundaries of the branch (base and top coords)
+	 */
+	refreshBoundaries() {
+		this.baseCoord = this.parent == null ? new THREE.Vector3() : this.parent.topCoord;
+		this.topCoord = this.getCoordsAtLength(this.length);
+	}
+
+	/**
+	 * Recursively update the boundaries of the branch and its ramifications
+	 */
+	update() {
+		this.refreshBoundaries();
+		for(var i = 0; i < this.ramifications.length; i++){
+			this.ramifications[i].update();
+		}
+	}
+
+	/**
+	 * Create the ramification
+	 */
+	genRamification () {
+		var count = Probability.random(this.config.prob.countChild);
+		var behaviourSeparation = Probability.random(this.config.prob.behaviourSeparation); 
+		var inheritance = behaviourSeparation == "ramification" ? true : false; 
+		for(var i=0; i<count; i++) {
+			this.ramifications.push(new Branch({
+				inheritance: inheritance,
+				parent: this
+			}));
+			inheritance = false; 
+		}
+	}
+
+	
+
+	/**************************
+	*		Computation
+	**************************/
 
 	/**
 	 * Gen circle arround a point 
@@ -128,62 +128,34 @@ class Branch {
 	 * @returns {Vector3[]}
 	 */
 	genCircles(basePoints, precision) {
-		var points = [], direction, point, c, angle, crossAngle, cross, baseAngle, incAngle, w, advancement, diffWeight;
-		
-		// Add base coord at beginning and start loop at one to always calculate the direction vector
-		basePoints.unshift(this.baseCoord);
+		var points = [], direction, c, baseAngle, w, advancement, diffWeight;
+		basePoints.unshift(this.baseCoord); // Avoid basePoints[i-1] not defined for first occurence 
 		
 		// For each point create multiple point arround in circle
 		for(var i=1; i < basePoints.length; i++) {
 			
-			// If parent exist, calculate the current weight based on advancement in the branch to get a smooth weight transition 
-			if(this.parent){
-				advancement = (1 - Math.min(1, i*precision / this.length / this.config.transition.w ) ); 
-				diffWeight = this.parent.weight - this.weight; 
-			} else {
-				advancement = (1 - Math.min(1, i*precision / this.length / this.config.transition.w ) );
-				diffWeight = this.weight * 0.8; 
-			}
-
+			// calculate a smooth weight transition
+			advancement = (1 - Math.min(1, i*precision / this.length / this.config.transition.w ) ); 
+			diffWeight = this.parent ? this.parent.weight - this.weight : this.weight * 0.8; 
 			w = advancement * diffWeight + this.weight;
-
 
 			// Calculate the number of circle's points and the resulted step angle 
 			c = Math.floor(2*Math.PI*w/config.compute.dist); 
-			incAngle = Math.PI*2/c;
-
+			
 			// Create a random offset angle 
 			baseAngle = Math.random() * (2*Math.PI/6);
-			
 			// Direction Vector between last point and current point 
 			direction = new THREE.Vector3().copy(basePoints[i]).sub(basePoints[i-1]);
 			
 			// For each circle's points 
-			for(var j=0 ; j < c; j++){
+			var circlePoints = Trigonometry.genCircle(c, baseAngle, w);
+			circlePoints.map(function(point){
+				point = Trigonometry.rotateLooking(point, direction);
+				point.add(basePoints[i]);
+				points.push(point);
+			})
 
-				// Local angle in circle
-				angle = baseAngle + incAngle*j;  
-				
-				// Local coords resulted of local angle 
-				point = new THREE.Vector3( 
-					Math.cos(angle) * w, 0, Math.sin(angle) * w 
-				);
-
-				// Dot product to calculate the angle between direction and local unit vector 
-				crossAngle = Math.acos( point.dot( direction ) );
-				
-				// Cross local with direction to get the rotation axes
-				cross = new THREE.Vector3().copy(point).cross( direction )
-
-				// Apply rotation between the 2 vectors around cross axe
-				point.applyAxisAngle( cross, crossAngle ).add(basePoints[i]);
-
-				// Add Point 
-				points.push(new THREE.Vector3().copy(point));
-
-			}
 		}
-
 		return points;
 	}
 
