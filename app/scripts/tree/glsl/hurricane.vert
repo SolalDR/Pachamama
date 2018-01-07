@@ -61,7 +61,7 @@ float noise(vec3 p){
     vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
     vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
 
-    return o4.y * d.y + o4.x * (1.0 - d.y);
+    return (o4.y * d.y + o4.x * (1.0 - d.y)) - 0.5;
 }
 
 

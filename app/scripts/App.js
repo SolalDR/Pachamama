@@ -5,6 +5,7 @@ import Clock from "./helpers/Clock.js"
 import Tree from "./tree/Tree.js"
 import config from "./config.js"
 import initDatGUI from "./gui.js"
+import Galaxy from "./Galaxy.js"
 
 export default class App {
 
@@ -40,6 +41,9 @@ export default class App {
 
         this.tree = new Tree();
         this.scene.add(this.tree.mesh)
+
+        this.galaxy = new Galaxy();
+        this.scene.add(this.galaxy.mesh);
 
         // console.log(initDatGUI)
         if( this.config.gui ) {
@@ -78,6 +82,7 @@ export default class App {
         this.beforeRender();
 
         this.tree.render(this.clock.elapsed);
+        this.galaxy.render(this.clock.elapsed);
     	this.renderer.render( this.scene, this.camera );
         
         this.afterRender();
