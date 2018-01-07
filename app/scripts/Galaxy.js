@@ -94,10 +94,10 @@ class Galaxy {
     constructor( ) {
         this.config = {
             limit: {
-                min: 30,
-                max: 50
+                min: 20,
+                max: 40
             },
-            scale: 1,
+            scale: 0.5,
         }
         this.mesh = this.getInstances( 100 );        
     }

@@ -80,7 +80,7 @@ export default class App {
 
     render() {
         this.beforeRender();
-
+        this.controls.animate();
         this.tree.render(this.clock.elapsed);
         this.galaxy.render(this.clock.elapsed);
     	this.renderer.render( this.scene, this.camera );

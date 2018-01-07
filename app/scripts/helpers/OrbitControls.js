@@ -58,7 +58,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.rotateSpeed = 1.0;
 
 	// Set to false to disable panning
-	this.enablePan = true;
+	this.enablePan = false;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -118,6 +118,24 @@ THREE.OrbitControls = function ( object, domElement ) {
 		state = STATE.NONE;
 
 	};
+
+	this.animate = function(){
+		if(this.needAnimate) {
+			this.velocity.x *= 0.9; 
+			rotateLeft(this.velocity.x);
+			this.update();
+			if( Math.abs(this.velocity.x) < 0.01 ) {
+				this.velocity.x = 0;
+				this.needAnimate = false;
+			}
+		}
+	}
+
+	this.updateInertial = function(rotateDelta) {
+		this.velocity = new THREE.Vector2();
+		this.velocity.x = rotateDelta.x / 30;
+		this.velocity.y = 0 ;
+	}
 
 	// this method is exposed, but perhaps it would be better if we can make it private...
 	this.update = function () {
@@ -442,6 +460,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		rotateEnd.set( event.clientX, event.clientY );
 		rotateDelta.subVectors( rotateEnd, rotateStart );
+		
+		scope.updateInertial(rotateDelta);
 
 		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
@@ -498,9 +518,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleMouseUp( event ) {
-
-		// console.log( 'handleMouseUp' );
-
+		scope.needAnimate = true;
 	}
 
 	function handleMouseWheel( event ) {
