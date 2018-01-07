@@ -87,21 +87,23 @@ export default {
 
 		precision: 0.01,
 		dist: 0.1,
-		pointW: 1.5 // GUI
+		pointW: 1.5
 
 	},
 
 	animation: {
+
 		noise: {
-			speed: 0.001,  	// noiseSpeed
-			force: 0.1		// noiseIntensity
+			speed: 0.001,  	
+			force: 0.1		
 		},
+		
 		hurricane: {
-			radius: 2, 		// animRadius
-			turns: 5 		// animRotationSpeed
+			radius: 2, 		
+			turns: 5 		
 		},
 
-		durationLeave: 500	// GUI
+		durationLeave: 500
 	}
 
 }

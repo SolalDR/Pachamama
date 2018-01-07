@@ -11,7 +11,7 @@ var initDatGui = function() {
 
     gui.add(Tree.CONFIG.compute, 'precision', 0.001, 0.1).onFinishChange(this.tree.newGeometry.bind(this.tree));
     gui.add(Tree.CONFIG.compute, 'dist', 0.001, 1).onFinishChange(this.tree.newGeometry.bind(this.tree));
-    gui.add(Tree.CONFIG.compute, 'pointW', 0, 1).onFinishChange(this.tree.newGeometry.bind(this.tree));
+    gui.add(Tree.CONFIG.compute, 'pointW', 0.4, 5).onFinishChange(this.tree.updateUniforms.bind(this.tree));
     // gui.add(this.tree, 'animationAdvanced');
     
     gui.add(this.tree, 'display').listen();
