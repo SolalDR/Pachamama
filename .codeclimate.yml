@@ -1,0 +1,2 @@
+exclude_patterns:
+- "app/scripts/helpers/OrbitControls.js"
