@@ -1,4 +1,5 @@
 # Pachamama Project
+<a href="https://codeclimate.com/github/SolalDR/Pachamama/maintainability"><img src="https://api.codeclimate.com/v1/badges/c25aea305cfb1801374e/maintainability" /></a>
 
 A generative design project which allow to create in a pseudo random way an infinity of differents trees.
 It is based on the famous WebGL library, THREE.js
