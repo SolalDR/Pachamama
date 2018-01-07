@@ -115,7 +115,16 @@ class Branch {
 		}
 	}
 
-	
+	/**************************
+	*		Accessibility
+	**************************/
+
+	map(callback){
+		for (var i=0; i < this.ramifications.length; i++){
+			callback(this);
+			this.ramifications[i].map(callback);
+		}
+	}
 
 	/**************************
 	*		Computation
