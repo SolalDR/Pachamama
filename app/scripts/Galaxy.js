@@ -94,7 +94,7 @@ class Galaxy {
     constructor( ) {
         this.config = {
             limit: {
-                min: 10,
+                min: 30,
                 max: 50
             },
             scale: 1,

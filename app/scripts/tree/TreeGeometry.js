@@ -9,13 +9,27 @@ class TreeGeometry extends THREE.BufferGeometry {
 		
 		this._tree = tree;
 		this.type = "TreeGeometry";
-		this.vertices = this._tree.tree.compute(tree.config.compute.precision);
+		var result = this._tree.tree.compute(tree.config.compute.precision);
+		this.vertices = result.vertices;
+		this.weights = result.weights
 		this.computeVertices();
+		// this.computeWeights();
+
 
 		if( args.animate ){
 			this.initAnimation();
 		}
 
+	}
+
+	computeWeights(){
+		var bufferArray = new Float32Array( this.vertices.length);
+		for(var i=0; i<bufferArray.length; i++){
+			bufferArray[i] = this.weights[i];
+		}
+
+		console.log(bufferArray)
+		this.addAttribute( 'weight', new THREE.BufferAttribute( bufferArray , 1 ) );
 	}
 
 	computeVertices(){

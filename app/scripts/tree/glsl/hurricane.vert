@@ -103,7 +103,7 @@ void main() {
         newPosition = hurricane( anim, floorPos, position ); 
     } 
 
-    newPosition = newPosition + position * noise( vec3( position.xy, position.z + time*noiseSpeed ) ) * noiseIntensity;
+    newPosition = newPosition + position * noise( vec3( position.xy, position.z + time*noiseSpeed ) ) * (position.y / 15.) * noiseIntensity ;
     
     gl_PointSize = pointSize;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);

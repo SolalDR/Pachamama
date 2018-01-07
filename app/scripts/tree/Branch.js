@@ -174,16 +174,24 @@ class Branch {
 	 * @returns {Vector3[]}
 	 */
 	compute(precision) {
-		var points = [];
+		var points = [], weights = [];
 		var expectedL = Math.floor(this.length / precision);
 		for( var i=0; i< expectedL; i++ ) {
 			points.push(this.getCoordsAtLength(i*precision))
+			weights.push(this.weight); 
 		}
+
 		points = this.genCircles(points, precision);
 		for( var i = 0; i<this.ramifications.length; i++ ){
-			points = points.concat(this.ramifications[i].compute(precision))
+			var result = this.ramifications[i].compute(precision); 
+			
+			points = points.concat(result.vertices);
+			weights = weights.concat(result.weights);
 		}
-		return points; 
+		return {
+			vertices: points,
+			weights: weights
+		}; 
 	}
 
 }
