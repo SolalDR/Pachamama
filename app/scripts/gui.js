@@ -14,7 +14,6 @@ var initDatGui = function() {
     gui.add(Tree.CONFIG.compute, 'pointW', 0, 1).onFinishChange(this.tree.newGeometry.bind(this.tree));
 
     gui.add(this.tree, 'display')
-    gui.add(this.tree, 'hide')
 
     /**********
     *  Trunk

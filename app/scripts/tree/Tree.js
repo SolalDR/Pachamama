@@ -65,21 +65,16 @@ class Tree {
 	}
 
 	/**
-	 * Run the display animation
+	 * Hide or display the tree by starting an animation
+	 * @param {boolean} bool
 	 */
-	display() {
+	set display(bool) {
 		this.material.uniforms.start.value = this.time;
-		this.material.uniforms.isLeaving.value = false;
-		this.material.uniforms.needsUpdate = true; 
-	}
-
-	/**
-	 * Run the hide animation
-	 */
-	hide() {
-		this.material.uniforms.start.value = this.time;
-		this.material.uniforms.isLeaving.value = true;
-		this.material.uniforms.needsUpdate = true; 
+		this.material.uniforms.isLeaving.value = bool ? false : true;
+		this.material.uniforms.needsUpdate = true;
+	} 
+	get display() {
+		return !this.material.uniforms.isLeaving.value
 	}
 
 	/**
