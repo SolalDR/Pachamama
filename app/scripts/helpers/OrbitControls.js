@@ -16,6 +16,7 @@
 THREE.OrbitControls = function ( object, domElement ) {
 
 	this.object = object;
+	this.velocity = new THREE.Vector2();
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
@@ -132,7 +133,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	this.updateInertial = function(rotateDelta) {
-		this.velocity = new THREE.Vector2();
 		this.velocity.x = rotateDelta.x / 30;
 		this.velocity.y = 0 ;
 	}
