@@ -16,11 +16,17 @@ class Branch {
 		
 		this.noise = args.noise !== undefined ? args.noise : this.parent.noise; 
 		
-		this.length = null;
+		this.length = 0; // Local length
+		this.baseLength = this.parent ? this.parent.totalLength : 0; // Global length before the branch
+
 		this.weight = null;
 		this.ramifications = [];
 
 		this.init();
+	}
+
+	get totalLength() {
+		return this.length + this.baseLength;
 	}
 
 	/**
@@ -28,7 +34,7 @@ class Branch {
 	 */
 	init () {
 		// If branch is an inheritance, we copy certain value from the parent
-		this.noiseCoord = new THREE.Vector2(Math.random(), Math.random());	
+		this.noiseCoord = this.inheritance ? this.parent.noiseCoord : new THREE.Vector2(Math.random(), Math.random());	
 
 		var prop = Probability.between(config.branch.w.transfer.min, config.branch.w.transfer.max);
 		this.weight = prop * this.parent.weight;
@@ -56,16 +62,40 @@ class Branch {
 		return false;
 	}
 
+	getForceAtLength(l) {
+		if( this.inheritance ){
+			var endF = this.parent.getForceAtLength(this.parent.length); 
+			return Math.min(2, this.config.noise.force * (endF + l) ) 
+		}
+		return Math.min(2, this.config.noise.force * l)
+	}
+
+	getGlobalLength(l) {
+		return this.baseLength + l;
+	}
+
+	getNoiseCoordAtLength(l){
+		return {
+			x: new THREE.Vector2( this.config.noise.speed * l + this.noiseCoord.x,  this.noiseCoord.y  ),
+			z: new THREE.Vector2( this.noiseCoord.x, this.noiseCoord.y + this.config.noise.speed * l )
+		}
+	}
+
 	/**
 	 * Calculate the position of a point in the branch
 	 * @param {integer} l - the advancement
 	 * @returns {Vector3} 
 	 */
 	getCoordsAtLength(l) {
-		var c = this.config; 
+		var c = this.config;
 
-		var xDiff = c.noise.force * l * this.noise.simplex2(c.noise.speed * l + this.noiseCoord.x, this.noiseCoord.y );
-		var zDiff = c.noise.force * l * this.noise.simplex2(this.noiseCoord.x, this.noiseCoord.x + c.noise.speed *  l );
+		var gF = this.getForceAtLength(l); // Global force
+		var gL = this.getGlobalLength(l);  // Global length
+		var n = this.getNoiseCoordAtLength(gL);
+
+
+		var xDiff = gF * this.noise.simplex2( n.x.x, n.x.y );
+		var zDiff = gF * this.noise.simplex2( n.z.x, n.z.y );
 
 		var point = new THREE.Vector3().copy(this.baseCoord);
 

@@ -44,8 +44,8 @@ export default {
 
 			behaviourSeparation: {
 			
-				division: 0, // At the end of the branch, it split in x new branches 
-				ramification: 1 // At the end of the branch, a ramification is created and the master branch continue
+				division: 1, // At the end of the branch, it split in x new branches 
+				ramification: 0 // At the end of the branch, a ramification is created and the master branch continue
 			
 			},
 
@@ -73,9 +73,11 @@ export default {
 		prob: {
 
 			behaviourSeparation: {
-
-				division: 0.2, // At the end of the branch, it split in x new branches 
-				ramification: 1 // At the end of the branch, a ramification is created and the master branch continue
+				division: 1, // At the end of the branch, it split in x new branches 
+				ramification: 0 // At the end of the branch, a ramification is created and the master branch continue
+			
+				//division: 0.2, // At the end of the branch, it split in x new branches 
+				//ramification: 1 // At the end of the branch, a ramification is created and the master branch continue
 			
 			},
 
