@@ -61,7 +61,6 @@ void main() {
     vec3 pos = position;
     vec3 trans = translation;
 
-
     vec4 rot = rotation;
     // rot.x: = 2.*PI*noise(vec3(rotation.xy, rotation.z + time/1000.));
     
@@ -69,16 +68,13 @@ void main() {
     trans.y = (noise(vec3(trans.x, trans.y+time/10000000., trans.z)) - 0.5) * 100.;
     trans.z = (noise(vec3(trans.xy, trans.z+time/10000000.)) - 0.5) * 100.;
     
-    
-
     //transform it
     transform( pos, trans, rot, scale );
     //project to get the fragment position
     gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
     //just to render something :)
     vPos = pos;
-}
-`;
+}`;
 
 var fragment = `
 precision highp float;
@@ -86,8 +82,7 @@ varying vec3 vPos;
 void main() {
     //normalize( vPos )
     gl_FragColor = vec4( 0., 0., 0., .5 );
-}
-`;
+}`;
 
 class Galaxy {
 

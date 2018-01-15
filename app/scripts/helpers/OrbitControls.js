@@ -122,7 +122,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.animate = function(){
 		if(this.needAnimate) {
-			this.velocity.x *= 0.9; 
+			this.velocity.x *= 0.90; 
 			rotateLeft(this.velocity.x);
 			this.update();
 			if( Math.abs(this.velocity.x) < 0.01 ) {
@@ -133,7 +133,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	this.updateInertial = function(rotateDelta) {
-		this.velocity.x = rotateDelta.x / 30;
+		this.velocity.x = rotateDelta.x / 50;
 		this.velocity.y = 0 ;
 	}
 
